@@ -13,5 +13,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.21.1"
   }
 }
