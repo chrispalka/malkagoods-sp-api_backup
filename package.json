@@ -9,8 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-amplify": "^6.0.26",
     "@aws-sdk/client-secrets-manager": "^3.543.0",
+    "aws-amplify": "^6.0.26",
+    "aws-sdk": "^2.1592.0",
     "axios": "^1.6.8"
   }
 }

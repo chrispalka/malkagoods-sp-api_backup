@@ -11,6 +11,9 @@ const {
   GetSecretValueCommand,
 } = require('@aws-sdk/client-secrets-manager');
 
+const AWS = require('aws-sdk');
+const S3 = new AWS.S3();
+
 const secret_name = 'malkagoods/sp-api-secret';
 
 const client = new SecretsManagerClient({
@@ -31,22 +34,6 @@ const getSecret = async () => {
     throw error;
   }
 };
-
-// Call the async function and get the return value
-
-// Your code goes here
-
-// Parameters will be of the form { Name: 'secretName', Value: 'secretValue', ... }[]
-
-/*
-Parameters will be of the form { Name: 'secretName', Value: 'secretValue', ... }[]
-
-Copyright 2017 - 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
-    http://aws.amazon.com/apache2.0/
-or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and limitations under the License.
-*/
 
 /* Amplify Params - DO NOT EDIT
 	ENV
@@ -127,6 +114,23 @@ app.get('/getInventory', async function (req, res) {
         });
       };
 
+      const uploadJSON = async (items) => {
+        try {
+          const params = {
+            Bucket: process.env.S3_BUCKET_NAME,
+            Key: 'products',
+            Body: JSON.stringify(items),
+            ContentType: 'application/json; charset=utf-8',
+          };
+          await S3.putObject(params).promise();
+          console.log('Upload Complete');
+          res.sendStatus(200);
+        } catch (e) {
+          console.log('Upload Error: ', e);
+          res.sendStatus(422);
+        }
+      };
+
       //get reportDocument
       const getReportDocument = (reportDocId) => {
         let url;
@@ -138,7 +142,7 @@ app.get('/getInventory', async function (req, res) {
         )
           .then((response) => {
             parseData(response.data.url).then((items) => {
-              res.status(200).json({ items });
+              uploadJSON(items);
             });
           })
           .catch((error) => {
@@ -245,51 +249,51 @@ app.get('/inventory/*', function (req, res) {
   res.json({ success: 'get call succeed!', url: req.url });
 });
 
-/****************************
- * Example post method *
- ****************************/
+// /****************************
+//  * Example post method *
+//  ****************************/
 
-app.post('/inventory', function (req, res) {
-  // Add your code here
-  res.json({ success: 'post call succeed!', url: req.url, body: req.body });
-});
+// app.post('/inventory', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'post call succeed!', url: req.url, body: req.body });
+// });
 
-app.post('/inventory/*', function (req, res) {
-  // Add your code here
-  res.json({ success: 'post call succeed!', url: req.url, body: req.body });
-});
+// app.post('/inventory/*', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'post call succeed!', url: req.url, body: req.body });
+// });
 
-/****************************
- * Example put method *
- ****************************/
+// /****************************
+//  * Example put method *
+//  ****************************/
 
-app.put('/inventory', function (req, res) {
-  // Add your code here
-  res.json({ success: 'put call succeed!', url: req.url, body: req.body });
-});
+// app.put('/inventory', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'put call succeed!', url: req.url, body: req.body });
+// });
 
-app.put('/inventory/*', function (req, res) {
-  // Add your code here
-  res.json({ success: 'put call succeed!', url: req.url, body: req.body });
-});
+// app.put('/inventory/*', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'put call succeed!', url: req.url, body: req.body });
+// });
 
-/****************************
- * Example delete method *
- ****************************/
+// /****************************
+//  * Example delete method *
+//  ****************************/
 
-app.delete('/inventory', function (req, res) {
-  // Add your code here
-  res.json({ success: 'delete call succeed!', url: req.url });
-});
+// app.delete('/inventory', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'delete call succeed!', url: req.url });
+// });
 
-app.delete('/inventory/*', function (req, res) {
-  // Add your code here
-  res.json({ success: 'delete call succeed!', url: req.url });
-});
+// app.delete('/inventory/*', function (req, res) {
+//   // Add your code here
+//   res.json({ success: 'delete call succeed!', url: req.url });
+// });
 
-app.listen(3000, function () {
-  console.log('App started');
-});
+// app.listen(3000, function () {
+//   console.log('App started');
+// });
 
 // Export the app object. When executing the application local this does nothing. However,
 // to port it to AWS Lambda we will create a wrapper around that will load the app from

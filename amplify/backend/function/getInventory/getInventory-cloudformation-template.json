@@ -33,6 +33,9 @@
     },
     "marketplaceId": {
       "Type": "String"
+    },
+    "s3BucketName": {
+      "Type": "String"
     }
   },
   "Conditions": {
@@ -105,6 +108,9 @@
             },
             "MARKETPLACE_ID": {
               "Ref": "marketplaceId"
+            },
+            "S3_BUCKET_NAME": {
+              "Ref": "s3BucketName"
             }
           }
         },

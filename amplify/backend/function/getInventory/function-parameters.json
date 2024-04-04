@@ -24,6 +24,10 @@
     {
       "cloudFormationParameterName": "marketplaceId",
       "environmentVariableName": "MARKETPLACE_ID"
+    },
+    {
+      "cloudFormationParameterName": "s3BucketName",
+      "environmentVariableName": "S3_BUCKET_NAME"
     }
   ],
   "secretNames": []
