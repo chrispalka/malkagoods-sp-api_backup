@@ -1,0 +1,92 @@
+{
+  "api": {
+    "sellingpartnerapi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "getInventory"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "function": {
+    "getInventory": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_getInventory_authUrl": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getInventory"
+        }
+      ]
+    },
+    "AMPLIFY_function_getInventory_baseUrl": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getInventory"
+        }
+      ]
+    },
+    "AMPLIFY_function_getInventory_clientId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getInventory"
+        }
+      ]
+    },
+    "AMPLIFY_function_getInventory_clientSecret": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getInventory"
+        }
+      ]
+    },
+    "AMPLIFY_function_getInventory_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getInventory"
+        }
+      ]
+    },
+    "AMPLIFY_function_getInventory_marketplaceId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getInventory"
+        }
+      ]
+    },
+    "AMPLIFY_function_getInventory_refreshToken": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getInventory"
+        }
+      ]
+    },
+    "AMPLIFY_function_getInventory_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getInventory"
+        }
+      ]
+    }
+  }
+}

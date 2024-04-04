@@ -1,0 +1,30 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "clientId",
+      "environmentVariableName": "CLIENT_ID"
+    },
+    {
+      "cloudFormationParameterName": "clientSecret",
+      "environmentVariableName": "CLIENT_SECRET"
+    },
+    {
+      "cloudFormationParameterName": "refreshToken",
+      "environmentVariableName": "REFRESH_TOKEN"
+    },
+    {
+      "cloudFormationParameterName": "authUrl",
+      "environmentVariableName": "AUTH_URL"
+    },
+    {
+      "cloudFormationParameterName": "baseUrl",
+      "environmentVariableName": "BASE_URL"
+    },
+    {
+      "cloudFormationParameterName": "marketplaceId",
+      "environmentVariableName": "MARKETPLACE_ID"
+    }
+  ],
+  "secretNames": []
+}
