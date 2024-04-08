@@ -63,10 +63,6 @@ app.use(function (req, res, next) {
   next();
 });
 
-/**********************
- * Example get method *
- **********************/
-
 app.get('/getInventory', async function (req, res) {
   const secretValue = await getSecret();
   const spClientSecret = secretValue.SecretString
@@ -96,21 +92,25 @@ app.get('/getInventory', async function (req, res) {
 
       const parseData = (url) => {
         return axios(url).then((response) => {
+          const result = [];
           const data = response.data;
           // Split data into rows
           const rows = data.split('\n');
 
           // Extract column headers
-          const headers = rows.shift().split('\t');
-          const items = rows.map((row) => {
-            const columns = row.split('\t');
-            const item = {};
-            headers.forEach((header, index) => {
-              item[header] = columns[index];
-            });
-            return item;
+          const asinIndex = rows.shift().split('\t').indexOf('asin1');
+          rows.forEach((row) => {
+            result.push(row.split('\t')[asinIndex]);
           });
-          return items; // Return the items object
+          // const items = rows.map((row) => {
+          //   const asin = row.split('\t')[asinIndex];
+          //   const item = {};
+          //   headers.forEach((header, index) => {
+          //     item[header] = columns[index];
+          //   });
+          //   return item;
+          // });
+          return result; // Return the items object
         });
       };
 
@@ -131,9 +131,46 @@ app.get('/getInventory', async function (req, res) {
         }
       };
 
+      const getItems = (asinArr) => {
+        // ?marketplaceIds=ATVPDKIKX0DER
+        axios(
+          `${process.env.BASE_URL}/catalog/2022-04-01/items/${ASIN}?marketplaceIds=${process.env.MARKETPLACE_ID}`,
+          {
+            headers,
+          }
+        )
+          .then((response) => {
+            /*
+
+              ***IMPLEMENT ***
+              uploadJSON(items);
+
+            */
+
+            console.log(response.data);
+          })
+          .catch((error) => {
+            if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              console.error(
+                'Server responded with status code:',
+                error.response.status
+              );
+              console.error('Response data:', error.response.data);
+            } else if (error.request) {
+              // The request was made but no response was received
+              console.error('No response received:', error.request);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+              console.error('Error setting up the request:', error.message);
+            }
+            res.status(500).json({ error: 'Error fetching report document' });
+          });
+      };
+
       //get reportDocument
       const getReportDocument = (reportDocId) => {
-        let url;
         axios(
           `${process.env.BASE_URL}/reports/2021-06-30/documents/${reportDocId}`,
           {
@@ -141,8 +178,9 @@ app.get('/getInventory', async function (req, res) {
           }
         )
           .then((response) => {
+            console.log(response.data.url);
             parseData(response.data.url).then((items) => {
-              uploadJSON(items);
+              getItems(items);
             });
           })
           .catch((error) => {
@@ -215,7 +253,6 @@ app.get('/getInventory', async function (req, res) {
             headers,
           })
           .then((response) => {
-            console.log('reportId: ', response.data.reportId);
             getReportDocId(response.data.reportId);
           })
           .catch((error) => {
@@ -238,6 +275,7 @@ app.get('/getInventory', async function (req, res) {
       };
 
       createReport();
+      // getItem('B0B1QZFLDC');
     })
     .catch((err) => {
       console.log('Error: ', err);
