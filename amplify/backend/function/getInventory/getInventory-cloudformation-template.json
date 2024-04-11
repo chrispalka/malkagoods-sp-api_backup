@@ -19,12 +19,6 @@
     "clientId": {
       "Type": "String"
     },
-    "clientSecret": {
-      "Type": "String"
-    },
-    "refreshToken": {
-      "Type": "String"
-    },
     "authUrl": {
       "Type": "String"
     },
@@ -35,6 +29,9 @@
       "Type": "String"
     },
     "s3BucketName": {
+      "Type": "String"
+    },
+    "refreshToken": {
       "Type": "String"
     }
   },
@@ -94,12 +91,6 @@
             "CLIENT_ID": {
               "Ref": "clientId"
             },
-            "CLIENT_SECRET": {
-              "Ref": "clientSecret"
-            },
-            "REFRESH_TOKEN": {
-              "Ref": "refreshToken"
-            },
             "AUTH_URL": {
               "Ref": "authUrl"
             },
@@ -111,6 +102,9 @@
             },
             "S3_BUCKET_NAME": {
               "Ref": "s3BucketName"
+            },
+            "REFRESH_TOKEN": {
+              "Ref": "refreshToken"
             }
           }
         },

@@ -98,10 +98,19 @@ app.get('/getInventory', async function (req, res) {
           const rows = data.split('\n');
 
           // Extract column headers
+          const statusIndex = rows[0].split('\t').indexOf('status');
           const asinIndex = rows.shift().split('\t').indexOf('asin1');
+          console.log('status index: ', statusIndex);
           rows.forEach((row) => {
-            result.push(row.split('\t')[asinIndex]);
+            if (row.split('\t')[statusIndex] === 'Active') {
+              result.push(row.split('\t')[asinIndex]);
+            }
           });
+          const getUniqueValues = (array) => [...new Set(array)];
+          console.log('result: ', result);
+
+          return getUniqueValues(result);
+
           // const items = rows.map((row) => {
           //   const asin = row.split('\t')[asinIndex];
           //   const item = {};
@@ -132,22 +141,18 @@ app.get('/getInventory', async function (req, res) {
       };
 
       const getItems = (asinArr) => {
-        // ?marketplaceIds=ATVPDKIKX0DER
+        // const getUniqueValues = (array) => [...new Set(array)];
+
+        console.log(asinArr.length);
+        let identifiers = asinArr.join();
         axios(
-          `${process.env.BASE_URL}/catalog/2022-04-01/items/${ASIN}?marketplaceIds=${process.env.MARKETPLACE_ID}`,
+          `${process.env.BASE_URL}/catalog/2022-04-01/items?identifiers=${identifiers}&identifiersType=ASIN&marketplaceIds=${process.env.MARKETPLACE_ID}&includedData=summaries,images`,
           {
             headers,
           }
         )
           .then((response) => {
-            /*
-
-              ***IMPLEMENT ***
-              uploadJSON(items);
-
-            */
-
-            console.log(response.data);
+            uploadJSON(response.data.items);
           })
           .catch((error) => {
             if (error.response) {
@@ -165,7 +170,7 @@ app.get('/getInventory', async function (req, res) {
               // Something happened in setting up the request that triggered an Error
               console.error('Error setting up the request:', error.message);
             }
-            res.status(500).json({ error: 'Error fetching report document' });
+            res.status(500).json({ error: 'Error connecting to catalog API' });
           });
       };
 
@@ -246,7 +251,7 @@ app.get('/getInventory', async function (req, res) {
         const data = {
           marketplaceIds: [process.env.MARKETPLACE_ID],
           reportType: 'GET_MERCHANT_LISTINGS_ALL_DATA',
-          dataStartTime: '2024-03-25T20:11:24.000Z',
+          dataStartTime: '2024-04-10T20:11:24.000Z',
         };
         axios
           .post(`${process.env.BASE_URL}/reports/2021-06-30/reports`, data, {
@@ -275,7 +280,7 @@ app.get('/getInventory', async function (req, res) {
       };
 
       createReport();
-      // getItem('B0B1QZFLDC');
+      // getItems('B0B1QZFLDC');
     })
     .catch((err) => {
       console.log('Error: ', err);

@@ -6,14 +6,6 @@
       "environmentVariableName": "CLIENT_ID"
     },
     {
-      "cloudFormationParameterName": "clientSecret",
-      "environmentVariableName": "CLIENT_SECRET"
-    },
-    {
-      "cloudFormationParameterName": "refreshToken",
-      "environmentVariableName": "REFRESH_TOKEN"
-    },
-    {
       "cloudFormationParameterName": "authUrl",
       "environmentVariableName": "AUTH_URL"
     },
@@ -28,6 +20,10 @@
     {
       "cloudFormationParameterName": "s3BucketName",
       "environmentVariableName": "S3_BUCKET_NAME"
+    },
+    {
+      "cloudFormationParameterName": "refreshToken",
+      "environmentVariableName": "REFRESH_TOKEN"
     }
   ],
   "secretNames": []

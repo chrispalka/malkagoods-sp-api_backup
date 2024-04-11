@@ -48,14 +48,6 @@
         }
       ]
     },
-    "AMPLIFY_function_getInventory_clientSecret": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "getInventory"
-        }
-      ]
-    },
     "AMPLIFY_function_getInventory_deploymentBucketName": {
       "usedBy": [
         {
