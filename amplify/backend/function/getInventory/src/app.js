@@ -100,16 +100,13 @@ app.get('/getInventory', async function (req, res) {
           // Extract column headers
           const statusIndex = rows[0].split('\t').indexOf('status');
           const asinIndex = rows.shift().split('\t').indexOf('asin1');
-          console.log('status index: ', statusIndex);
           rows.forEach((row) => {
             if (row.split('\t')[statusIndex] === 'Active') {
               result.push(row.split('\t')[asinIndex]);
             }
           });
           const getUniqueValues = (array) => [...new Set(array)];
-          console.log('result: ', result);
-
-          return getUniqueValues(result.slice(0, 20));
+          return getUniqueValues(result.slice(0, 20)).join();
         });
       };
 
@@ -126,17 +123,18 @@ app.get('/getInventory', async function (req, res) {
           res.sendStatus(200);
         } catch (e) {
           console.log('Upload Error: ', e);
-          res.sendStatus(422);
+          res.status(422).json({ error: 'Error uploading to S3' });
         }
       };
 
-      const getItems = (asinArr) => {
-        // const getUniqueValues = (array) => [...new Set(array)];
-
-        console.log(asinArr.length);
-        let identifiers = asinArr.join();
+      const getItems = (asinStr) => {
+        /***
+         *
+         * implemenet chunking of asinARR in 20 next
+         *
+         * ***/
         axios(
-          `${process.env.BASE_URL}/catalog/2022-04-01/items?identifiers=${identifiers}&identifiersType=ASIN&marketplaceIds=${process.env.MARKETPLACE_ID}&includedData=summaries,images`,
+          `${process.env.BASE_URL}/catalog/2022-04-01/items?identifiers=${asinStr}&identifiersType=ASIN&marketplaceIds=${process.env.MARKETPLACE_ID}&includedData=summaries,images`,
           {
             headers,
           }
@@ -146,25 +144,20 @@ app.get('/getInventory', async function (req, res) {
           })
           .catch((error) => {
             if (error.response) {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
               console.error(
                 'Server responded with status code:',
                 error.response.status
               );
               console.error('Response data:', error.response.data);
             } else if (error.request) {
-              // The request was made but no response was received
               console.error('No response received:', error.request);
             } else {
-              // Something happened in setting up the request that triggered an Error
               console.error('Error setting up the request:', error.message);
             }
             res.status(500).json({ error: 'Error connecting to catalog API' });
           });
       };
 
-      //get reportDocument
       const getReportDocument = (reportDocId) => {
         axios(
           `${process.env.BASE_URL}/reports/2021-06-30/documents/${reportDocId}`,
@@ -173,32 +166,26 @@ app.get('/getInventory', async function (req, res) {
           }
         )
           .then((response) => {
-            console.log(response.data.url);
             parseData(response.data.url).then((items) => {
               getItems(items);
             });
           })
           .catch((error) => {
             if (error.response) {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
               console.error(
                 'Server responded with status code:',
                 error.response.status
               );
               console.error('Response data:', error.response.data);
             } else if (error.request) {
-              // The request was made but no response was received
               console.error('No response received:', error.request);
             } else {
-              // Something happened in setting up the request that triggered an Error
               console.error('Error setting up the request:', error.message);
             }
             res.status(500).json({ error: 'Error fetching report document' });
           });
       };
 
-      //get reportDocId
       const getReportDocId = (reportId) => {
         axios(
           `${process.env.BASE_URL}/reports/2021-06-30/reports/${reportId}`,
@@ -219,24 +206,22 @@ app.get('/getInventory', async function (req, res) {
           })
           .catch((error) => {
             if (error.response) {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
               console.error(
                 'Server responded with status code:',
                 error.response.status
               );
               console.error('Response data:', error.response.data);
             } else if (error.request) {
-              // The request was made but no response was received
               console.error('No response received:', error.request);
             } else {
-              // Something happened in setting up the request that triggered an Error
               console.error('Error setting up the request:', error.message);
             }
+            res
+              .status(500)
+              .json({ error: 'Error fetching report document ID' });
           });
       };
 
-      // create report
       const createReport = () => {
         const data = {
           marketplaceIds: [process.env.MARKETPLACE_ID],
@@ -252,25 +237,20 @@ app.get('/getInventory', async function (req, res) {
           })
           .catch((error) => {
             if (error.response) {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
               console.error(
                 'Server responded with status code:',
                 error.response.status
               );
               console.error('Response data:', error.response.data);
             } else if (error.request) {
-              // The request was made but no response was received
               console.error('No response received:', error.request);
             } else {
-              // Something happened in setting up the request that triggered an Error
               console.error('Error setting up the request:', error.message);
             }
+            res.status(500).json({ error: 'Error creating report' });
           });
       };
-
       createReport();
-      // getItems('B0B1QZFLDC');
     })
     .catch((err) => {
       console.log('Error: ', err);
@@ -282,53 +262,4 @@ app.get('/inventory/*', function (req, res) {
   res.json({ success: 'get call succeed!', url: req.url });
 });
 
-// /****************************
-//  * Example post method *
-//  ****************************/
-
-// app.post('/inventory', function (req, res) {
-//   // Add your code here
-//   res.json({ success: 'post call succeed!', url: req.url, body: req.body });
-// });
-
-// app.post('/inventory/*', function (req, res) {
-//   // Add your code here
-//   res.json({ success: 'post call succeed!', url: req.url, body: req.body });
-// });
-
-// /****************************
-//  * Example put method *
-//  ****************************/
-
-// app.put('/inventory', function (req, res) {
-//   // Add your code here
-//   res.json({ success: 'put call succeed!', url: req.url, body: req.body });
-// });
-
-// app.put('/inventory/*', function (req, res) {
-//   // Add your code here
-//   res.json({ success: 'put call succeed!', url: req.url, body: req.body });
-// });
-
-// /****************************
-//  * Example delete method *
-//  ****************************/
-
-// app.delete('/inventory', function (req, res) {
-//   // Add your code here
-//   res.json({ success: 'delete call succeed!', url: req.url });
-// });
-
-// app.delete('/inventory/*', function (req, res) {
-//   // Add your code here
-//   res.json({ success: 'delete call succeed!', url: req.url });
-// });
-
-// app.listen(3000, function () {
-//   console.log('App started');
-// });
-
-// Export the app object. When executing the application local this does nothing. However,
-// to port it to AWS Lambda we will create a wrapper around that will load the app from
-// this file
 module.exports = app;
