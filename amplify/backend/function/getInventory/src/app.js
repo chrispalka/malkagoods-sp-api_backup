@@ -109,17 +109,7 @@ app.get('/getInventory', async function (req, res) {
           const getUniqueValues = (array) => [...new Set(array)];
           console.log('result: ', result);
 
-          return getUniqueValues(result);
-
-          // const items = rows.map((row) => {
-          //   const asin = row.split('\t')[asinIndex];
-          //   const item = {};
-          //   headers.forEach((header, index) => {
-          //     item[header] = columns[index];
-          //   });
-          //   return item;
-          // });
-          return result; // Return the items object
+          return getUniqueValues(result.slice(0, 20));
         });
       };
 
