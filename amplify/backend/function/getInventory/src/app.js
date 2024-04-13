@@ -115,10 +115,6 @@ app.get('/getInventory', async function (req, res) {
               result.push(row.split('\t')[asinIndex]);
             }
           });
-
-          /*
-            CREATE ARRAY of 20 ARRAY CHUNKS?
-          */
           const getUniqueValues = (array) => [...new Set(array)];
           return chunkArr(getUniqueValues(result), 20);
         });
@@ -142,12 +138,12 @@ app.get('/getInventory', async function (req, res) {
       };
 
       const getItems = async (asinArr) => {
-        const tempArry = [];
+        const tempArr = [];
         const promises = asinArr.map((arrChunk) => {
           return axios(
             `${
               process.env.BASE_URL
-            }/catalog/2022-04-01/items?identifiers=${arrChunk.join()}&identifiersType=ASIN&marketplaceIds=${
+            }/catalog/2022-04-01/items?identifiers=${arrChunk.join()}&identifiersType=ASIN&pageSize=20&marketplaceIds=${
               process.env.MARKETPLACE_ID
             }&includedData=summaries,images`,
             {
@@ -158,9 +154,9 @@ app.get('/getInventory', async function (req, res) {
         try {
           const responses = await Promise.all(promises);
           responses.forEach((response) => {
-            tempArry.push(response.data.items);
+            tempArr.push(response.data.items);
           });
-          const resultSet = [].concat(...tempArry);
+          const resultSet = [].concat(...tempArr);
           uploadJSON(resultSet);
         } catch (error) {
           console.error('Error: ', error);
