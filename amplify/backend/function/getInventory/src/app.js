@@ -90,6 +90,16 @@ app.get('/getInventory', async function (req, res) {
         'x-amz-access-token': accessToken,
       };
 
+      const chunkArr = (arr, chunk) => {
+        const results = [];
+        const tmpArr = arr.slice();
+
+        while (tmpArr.length) {
+          results.push(tmpArr.splice(0, chunk));
+        }
+        return results;
+      };
+
       const parseData = (url) => {
         return axios(url).then((response) => {
           const result = [];
@@ -105,8 +115,12 @@ app.get('/getInventory', async function (req, res) {
               result.push(row.split('\t')[asinIndex]);
             }
           });
+
+          /*
+            CREATE ARRAY of 20 ARRAY CHUNKS?
+          */
           const getUniqueValues = (array) => [...new Set(array)];
-          return getUniqueValues(result.slice(0, 20)).join();
+          return chunkArr(getUniqueValues(result), 20);
         });
       };
 
@@ -127,35 +141,31 @@ app.get('/getInventory', async function (req, res) {
         }
       };
 
-      const getItems = (asinStr) => {
-        /***
-         *
-         * implemenet chunking of asinARR in 20 next
-         *
-         * ***/
-        axios(
-          `${process.env.BASE_URL}/catalog/2022-04-01/items?identifiers=${asinStr}&identifiersType=ASIN&marketplaceIds=${process.env.MARKETPLACE_ID}&includedData=summaries,images`,
-          {
-            headers,
-          }
-        )
-          .then((response) => {
-            uploadJSON(response.data.items);
-          })
-          .catch((error) => {
-            if (error.response) {
-              console.error(
-                'Server responded with status code:',
-                error.response.status
-              );
-              console.error('Response data:', error.response.data);
-            } else if (error.request) {
-              console.error('No response received:', error.request);
-            } else {
-              console.error('Error setting up the request:', error.message);
+      const getItems = async (asinArr) => {
+        const tempArry = [];
+        const promises = asinArr.map((arrChunk) => {
+          return axios(
+            `${
+              process.env.BASE_URL
+            }/catalog/2022-04-01/items?identifiers=${arrChunk.join()}&identifiersType=ASIN&marketplaceIds=${
+              process.env.MARKETPLACE_ID
+            }&includedData=summaries,images`,
+            {
+              headers,
             }
-            res.status(500).json({ error: 'Error connecting to catalog API' });
+          );
+        });
+        try {
+          const responses = await Promise.all(promises);
+          responses.forEach((response) => {
+            tempArry.push(response.data.items);
           });
+          const resultSet = [].concat(...tempArry);
+          uploadJSON(resultSet);
+        } catch (error) {
+          console.error('Error: ', error);
+          throw error;
+        }
       };
 
       const getReportDocument = (reportDocId) => {
