@@ -172,6 +172,7 @@ app.get('/getInventory', async function (req, res) {
           }
         )
           .then((response) => {
+            console.log(response.data.url);
             parseData(response.data.url).then((items) => {
               getItems(items);
             });
@@ -258,8 +259,19 @@ app.get('/getInventory', async function (req, res) {
       };
       createReport();
     })
-    .catch((err) => {
-      console.log('Error: ', err);
+    .catch((error) => {
+      if (error.response) {
+        console.error(
+          'Server responded with status code:',
+          error.response.status
+        );
+        console.error('Response data:', error.response.data);
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+      } else {
+        console.error('Error setting up the request:', error.message);
+      }
+      res.status(500).json({ error: 'Error fetching token' });
     });
 });
 
